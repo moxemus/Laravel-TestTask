@@ -26,6 +26,7 @@ class Worker extends Model
 	public $timestamps = false;
 
     protected $primaryKey = 'id';
+    protected $hidden = array('pivot');
 
 	protected $casts = [
 		'gender' => 'int',
@@ -42,7 +43,6 @@ class Worker extends Model
 
     public function departments(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-//        return $this->belongsToMany(Department::class);
         return $this->belongsToMany(Department::class, 'worker_department');
     }
 }
