@@ -1,7 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\DepartmentController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -14,9 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::resource('worker', WorkerController::class);
 
-
-
-
-
+Route::resource('department', DepartmentController::class);
 
