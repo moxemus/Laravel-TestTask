@@ -17,8 +17,8 @@ class AddForeignKeysWorkerDepartment extends Migration
            $table->bigInteger('worker_id')->unsigned()->change();
            $table->bigInteger('department_id')->unsigned()->change();
 
-           $table->foreign('worker_id')->references('id')->on('worker')->onDelete('restrict');
-           $table->foreign('department_id')->references('id')->on('department')->onDelete('restrict');
+           $table->foreign('worker_id')->references('id')->on('worker')->onDelete('no action');
+           $table->foreign('department_id')->references('id')->on('department')->onDelete('no action');
         });
     }
 

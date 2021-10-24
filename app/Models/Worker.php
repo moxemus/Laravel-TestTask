@@ -1,25 +1,9 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class Worker
- *
- * @property int $id
- * @property string $name
- * @property string $surname
- * @property string $patronymic
- * @property int $gender
- * @property float $salary
- *
- * @package App\Models
- */
 class Worker extends Model
 {
 	protected $table = 'worker';
@@ -41,7 +25,7 @@ class Worker extends Model
 		'salary'
 	];
 
-    public function departments(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function departments()
     {
         return $this->belongsToMany(Department::class, 'worker_department');
     }

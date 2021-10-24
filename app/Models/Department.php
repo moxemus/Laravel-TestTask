@@ -1,23 +1,9 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class Department
- *
- * @property int $id
- * @property string $name
- * @property mixed $workers_count
- * @property mixed $max_salary
- *
- * @package App\Models
- */
 class Department extends Model
 {
 	protected $table = 'department';

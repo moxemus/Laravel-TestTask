@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\Worker;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,22 +20,24 @@ class WorkerController extends Controller
         ];
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return JsonResponse
-     */
-    public function index()
+    private function getJsonData(Worker $worker)
     {
+        $departments = $worker->departments()->get(['department.id', 'department.name'])->toArray();
 
+        return array_merge(['Info' => $worker], array('Departments' => $departments));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    public function index()
+    {
+        $json_result = [];
+
+        foreach (Worker::all() as $worker){
+            $json_result[] = $this->getJsonData($worker);
+        }
+
+        return response()->json($json_result);
+    }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), $this->getRules());
@@ -50,29 +52,11 @@ class WorkerController extends Controller
         return response()->json(array('Result' => 'Good'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param Worker $worker
-     * @return JsonResponse
-     */
     public function show(Worker $worker)
     {
-        $departments = $worker->departments()->get(['department.id', 'department.name'])->toArray();
-
-        $worker_info = array('Info' => $worker);
-        $departments = array('Departments' => $departments);
-
-        return response()->json(array_merge($worker_info, $departments));
+        return response()->json($this->getJsonDate($worker));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param Worker $worker
-     * @return JsonResponse
-     */
     public function update(Request $request, Worker $worker)
     {
         $validator = Validator::make($request->all(), $this->getRules());
@@ -81,6 +65,24 @@ class WorkerController extends Controller
             return response()->json(array_merge(['Result' => 'Error'], array('Errors' => $validator->errors()->all())));
         }
 
+        //Validation for existing departments
+        foreach ($request['departments'] as $department_id) {
+            if (!Department::all()->has($department_id)) {
+                return response()->json(array_merge(['Result' => 'Error'],
+                    array('Errors' => "Department id = $department_id not found")));
+            }
+        }
+
+        //If all validations pass
+        //Delete old departments
+        $worker->departments()->distinct()->detach();
+
+        //Add new departments
+        foreach ($request['departments'] as $department_id) {
+            $worker->departments()->attach($department_id);
+        }
+
+        //Save worker info
         $worker->name = $request['name'];
         $worker->surname = $request['surname'];
         $worker->patronymic = $request['patronymic'];
@@ -92,12 +94,6 @@ class WorkerController extends Controller
         return response()->json(array('Result' => 'Good'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param Worker $worker
-     * @return JsonResponse
-     */
     public function destroy(Worker $worker)
     {
         $worker->delete();
