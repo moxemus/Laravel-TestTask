@@ -3,19 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
-use App\Models\Worker;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class DepartmentController extends Controller
 {
+    private function getRules()
+    {
+        return [
+            'name' => 'required|min:2|max:100'
+        ];
+    }
 
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function index()
     {
@@ -26,11 +30,20 @@ class DepartmentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), $this->getRules());
 
+        if ($validator->fails()) {
+            return response()->json(array_merge(['Result' => 'Error'], array('Errors' => $validator->errors()->all())));
+        }
+
+        $department = new Department($request->toArray());
+        $department->save();
+
+        return response()->json(array('Result' => 'Good'));
     }
 
     /**
@@ -41,16 +54,13 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     {
-        $worker_departments = $department->workers()->get(['worker.id', 'worker.name', 'worker.salary'])->toArray();
+        $workers = $department->workers()->get(['worker.id', 'worker.surname', 'worker.name',
+            'worker.patronymic', 'worker.salary'])->toArray();
 
-        $department_array = $department->toArray();
-        $department_array += ["workers_count" => count($worker_departments)];
-        $department_array += ["max_salary" => max($worker_departments)['salary']];
+        $info_array = array('Info' => array($department));
+        $workers_array = array('Workers' => $workers);
 
-        $department_info = array('Info' => $department_array);
-        $workers = array('Workers' => $worker_departments);
-
-        return response()->json(array_merge($department_info, $workers));
+        return response()->json(array_merge($info_array, $workers_array));
     }
 
     /**
@@ -58,21 +68,39 @@ class DepartmentController extends Controller
      *
      * @param Request $request
      * @param Department $department
-     * @return Response
+     * @return JsonResponse
      */
     public function update(Request $request, Department $department)
     {
+        $validator = Validator::make($request->all(), $this->getRules());
 
+        if ($validator->fails()) {
+            return response()->json(array_merge(['Result' => 'Error'], array('Errors' => $validator->errors()->all())));
+        }
+
+        $department->name = $request['name'];
+        $department->save();
+
+        return response()->json(array('Result' => 'Good'));
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param Department $department
-     * @return Response
+     * @return JsonResponse
      */
     public function destroy(Department $department)
     {
+        if ($department->workers_count > 0)
+        {
+            return response()->json(array_merge(['Result' =>'Error'],
+                array('Errors' => array("You can't delete department with workers"))));
 
+        }else{
+
+            $department->delete();
+            return response()->json(array('Result' => 'Good'));
+        }
     }
 }
