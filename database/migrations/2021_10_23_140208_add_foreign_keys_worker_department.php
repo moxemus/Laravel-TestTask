@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class AddForeignKeysWorkerDepartment extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::table('worker_department', function (Blueprint $table) {
@@ -20,15 +15,5 @@ class AddForeignKeysWorkerDepartment extends Migration
            $table->foreign('worker_id')->references('id')->on('worker')->onDelete('no action');
            $table->foreign('department_id')->references('id')->on('department')->onDelete('no action');
         });
-    }
-
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        //
     }
 }

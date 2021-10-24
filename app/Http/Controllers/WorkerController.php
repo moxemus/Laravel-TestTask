@@ -54,7 +54,7 @@ class WorkerController extends Controller
 
     public function show(Worker $worker)
     {
-        return response()->json($this->getJsonDate($worker));
+        return response()->json($this->getJsonData($worker));
     }
 
     public function update(Request $request, Worker $worker)
