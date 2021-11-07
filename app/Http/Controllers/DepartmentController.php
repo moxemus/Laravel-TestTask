@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\DepartmentCollection;
+use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,22 +15,9 @@ class DepartmentController extends Controller
         return ['name' => 'required|min:2|max:100'];
     }
 
-    private function getJsonData(Department $department)
-    {
-        $workers = $department->workers()->get(['worker.id', 'worker.name', 'worker.surname'])->toArray();
-
-        return array_merge(['Info' =>$department], array('Workers' => $workers));
-    }
-
     public function index()
     {
-        $json_result = [];
-
-        foreach (Department::all() as $department){
-            $json_result[] = $this->getJsonData($department);
-        }
-
-        return response()->json($json_result);
+        return new DepartmentCollection(Department::all());
     }
 
     public function store(Request $request)
@@ -47,7 +36,7 @@ class DepartmentController extends Controller
 
     public function show(Department $department)
     {
-        return response()->json($this->getJsonData($department));
+        return new DepartmentResource($department);
     }
 
     public function update(Request $request, Department $department)

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\WorkerCollection;
+use App\Http\Resources\WorkerResource;
 use App\Models\Department;
 use App\Models\Worker;
 use Illuminate\Http\Request;
@@ -20,22 +22,9 @@ class WorkerController extends Controller
         ];
     }
 
-    private function getJsonData(Worker $worker)
-    {
-        $departments = $worker->departments()->get(['department.id', 'department.name'])->toArray();
-
-        return array_merge(['Info' => $worker], array('Departments' => $departments));
-    }
-
     public function index()
     {
-        $json_result = [];
-
-        foreach (Worker::all() as $worker){
-            $json_result[] = $this->getJsonData($worker);
-        }
-
-        return response()->json($json_result);
+        return new WorkerCollection(Worker::all());
     }
 
     public function store(Request $request)
@@ -54,7 +43,7 @@ class WorkerController extends Controller
 
     public function show(Worker $worker)
     {
-        return response()->json($this->getJsonData($worker));
+        return new WorkerResource($worker);
     }
 
     public function update(Request $request, Worker $worker)
