@@ -24,7 +24,7 @@ class WorkerController extends Controller
 
     public function index()
     {
-        return new WorkerCollection(Worker::all());
+        return new WorkerCollection(Worker::paginate());
     }
 
     public function store(Request $request)

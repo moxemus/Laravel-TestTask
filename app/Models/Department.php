@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
 {
+    protected $perPage = 10;
+
 	protected $table = 'department';
 	public $timestamps = false;
 

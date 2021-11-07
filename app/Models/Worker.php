@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Worker extends Model
 {
+    protected $perPage = 10;
+
 	protected $table = 'worker';
 	public $timestamps = false;
 
