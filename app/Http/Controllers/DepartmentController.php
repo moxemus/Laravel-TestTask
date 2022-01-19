@@ -24,14 +24,13 @@ class DepartmentController extends Controller
     {
         $validator = Validator::make($request->all(), $this->getRules());
 
-        if ($validator->fails()) {
-            return response()->json(array_merge(['Result' => 'Error'], array('Errors' => $validator->errors()->all())));
-        }
+        if ($validator->fails())
+            return response()->json(['result' => 'error'], ['errors' => $validator->errors()->all()]);
 
         $department = new Department($request->toArray());
         $department->save();
 
-        return response()->json(array('Result' => 'Good'));
+        return response()->json(['result' => 'good']);
     }
 
     public function show(Department $department)
@@ -43,27 +42,24 @@ class DepartmentController extends Controller
     {
         $validator = Validator::make($request->all(), $this->getRules());
 
-        if ($validator->fails()) {
-            return response()->json(array_merge(['Result' => 'Error'], array('Errors' => $validator->errors()->all())));
-        }
+        if ($validator->fails())
+            return response()->json(['result' => 'error'], ['errors' => $validator->errors()->all()]);
 
         $department->name = $request['name'];
         $department->save();
 
-        return response()->json(array('Result' => 'Good'));
+        return response()->json(['result' => 'good']);
     }
 
     public function destroy(Department $department)
     {
-        if ($department->workers_count > 0)
-        {
-            return response()->json(array_merge(['Result' =>'Error'],
-                array('Errors' => array("You can't delete department with workers"))));
+        if ($department->workers_count > 0) {
+            return response()->json(['result' => 'error'], ['errors' => ["You can't delete department with workers"]]);
 
-        }else{
+        } else {
 
             $department->delete();
-            return response()->json(array('Result' => 'Good'));
+            return response()->json(['result' => 'good']);
         }
     }
 }

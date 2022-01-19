@@ -31,14 +31,13 @@ class WorkerController extends Controller
     {
         $validator = Validator::make($request->all(), $this->getRules());
 
-        if ($validator->fails()) {
-            return response()->json(array_merge(['Result' => 'Error'], array('Errors' => $validator->errors()->all())));
-        }
+        if ($validator->fails())
+            return response()->json(['result' => 'error'], ['errors' => $validator->errors()->all()]);
 
         $worker = new Worker($request->toArray());
         $worker->save();
 
-        return response()->json(array('Result' => 'Good'));
+        return response()->json(['result' => 'good']);
     }
 
     public function show(Worker $worker)
@@ -50,28 +49,18 @@ class WorkerController extends Controller
     {
         $validator = Validator::make($request->all(), $this->getRules());
 
-        if ($validator->fails()) {
-            return response()->json(array_merge(['Result' => 'Error'], array('Errors' => $validator->errors()->all())));
-        }
+        if ($validator->fails())
+            return response()->json(['result' => 'error'], ['errors' => $validator->errors()->all()]);
 
-        //Validation for existing departments
-        foreach ($request['departments'] as $department_id) {
-            if (!Department::all()->has($department_id)) {
-                return response()->json(array_merge(['Result' => 'Error'],
-                    array('Errors' => "Department id = $department_id not found")));
-            }
-        }
+        foreach ($request['departments'] as $department_id)
+            if (!Department::all()->has($department_id))
+                return response()->json(['result' => 'error'], ['errors' => "Department id = $department_id not found"]);
 
-        //If all validations pass
-        //Delete old departments
         $worker->departments()->distinct()->detach();
 
-        //Add new departments
-        foreach ($request['departments'] as $department_id) {
+        foreach ($request['departments'] as $department_id)
             $worker->departments()->attach($department_id);
-        }
 
-        //Save worker info
         $worker->name = $request['name'];
         $worker->surname = $request['surname'];
         $worker->patronymic = $request['patronymic'];
@@ -80,12 +69,12 @@ class WorkerController extends Controller
 
         $worker->save();
 
-        return response()->json(array('Result' => 'Good'));
+        return response()->json(['result' => 'good']);
     }
 
     public function destroy(Worker $worker)
     {
         $worker->delete();
-        return response()->json(array('Result' => 'Good'));
+        return response()->json(['result' => 'good']);
     }
 }
