@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Department;
+use App\Models\Worker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class WorkerDepartmentSeeder extends Seeder
 {
@@ -12,8 +13,8 @@ class WorkerDepartmentSeeder extends Seeder
     {
         for ($i = 0; $i < 10; $i++) {
             DB::table('worker_department')->insert([
-                'worker_id' => rand(1, 10),
-                'department_id' => rand(1, 10)
+                'worker_id' => Department::all()->random(1)->first()->id,
+                'department_id' => Worker::all()->random(1)->first()->id
             ]);
         }
     }
